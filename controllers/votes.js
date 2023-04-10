@@ -55,14 +55,18 @@ export const getUserMatches = async(req, res) => {
     votes.forEach(vote => {
       const match = matches.find(match => match._id && match._id.toString() == vote.matchId);
       if (match) {
-        matchData.push({
+        const matchDataItem = {
           matchId: vote.matchId,
           matchNo: match.matchNo,
           team1: match.team1,
           team2: match.team2,
           selectedTeam: vote.selectedTeam,
-          isWinner: vote.isCorrected
-        });
+          isWinner: vote.isCorrected,
+        };
+        if (match.winner !== null) {
+          matchDataItem.winnerTeam = match.winner;
+        }
+        matchData.push(matchDataItem);
       }
     });
 
