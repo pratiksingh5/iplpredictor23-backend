@@ -5,7 +5,6 @@ export const verifyToken = async (req, res, next) => {
     let token = req.header("Authorization");
 
     if (!token) {
-      console.log('run ho rha hai')
       return res.status(403).send("Access Denied");
     }
 

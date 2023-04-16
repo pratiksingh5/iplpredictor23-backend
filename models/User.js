@@ -53,11 +53,22 @@ const UserSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-UserSchema.pre('save', function(next) {
-  this.totalVote = this.votes.length;
-  this.correctedVote = this.votes.filter(vote => vote.isCorrect).length;
-  next();
+UserSchema.set('toObject', {virtuals: true})
+UserSchema.set('toJSON', {virtuals: true})
+
+UserSchema.virtual('totalVoteNew').get(function() {
+  return this.votes.length;
 });
+
+UserSchema.virtual('correctedVoteNew').get(function() {
+  return this.votes.filter(vote => vote.isCorrect).length;
+});
+
+// UserSchema.pre('save', function(next) {
+//   this.totalVote = this.votes.length;
+//   this.correctedVote = this.votes.filter(vote => vote.isCorrect).length;
+//   next();
+// });
 
 const User = mongoose.model("User", UserSchema);
 export default User;
