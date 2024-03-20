@@ -6,9 +6,10 @@ import nodemailer from "nodemailer";
 
 // Configuration 
 cloudinary.config({
-  cloud_name: process.env.CLOUD_NAME,
-  api_key: process.env.CLOUD_API_KEY,
-  api_secret: process.env.CLOUD_API_SECRET
+  cloud_name: "vbushoutout",
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+  secure: true  
 });
 
 /* REGISTER USER */
@@ -22,11 +23,23 @@ export const register = async (req, res) => {
       picturePath,
     } = req.body;
 
+    cloudinary.config({
+      cloud_name: "vbushoutout",
+      api_key: process.env.CLOUDINARY_API_KEY,
+      api_secret: process.env.CLOUDINARY_API_SECRET,
+      secure: true  
+    });
+
     const salt = await bcrypt.genSalt();
     const passwordHash = await bcrypt.hash(password, salt);
-    console.log(picturePath);
-    const myUpload = await cloudinary.uploader.upload('public/assets/' + picturePath);
-    console.log(myUpload)
+    let myUpload;
+    try {
+      myUpload = await cloudinary.uploader.upload('public/assets/' + picturePath);
+    } catch (uploadErr) {
+
+      throw new Error('Error uploading picture: ' + uploadErr);
+    }
+
 
     const newUser = new User({
       name,
@@ -85,8 +98,10 @@ export const forgotPassword = async(req, res) => {
     // Send OTP to user email
     const transporter = nodemailer.createTransport({
       service: 'Gmail',
+      secure: true,
       auth: {
-        user: 'vbushoutout@gmail.com',
+        // user: 'vbushoutout@gmail.com',
+        user: 'thedialoguesaga@gmail.com',
         pass: process.env.VBU_PASSWORD
       }
     });
