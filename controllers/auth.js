@@ -3,11 +3,6 @@ import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import cloudinary from "cloudinary";
 import nodemailer from "nodemailer";
-import path from "path";
-// import multer from 'multer';
-
-// const storage = multer.memoryStorage();
-// const upload = multer({ storage });
 
 // Configuration 
 cloudinary.config({
@@ -38,14 +33,14 @@ export const register = async (req, res) => {
     const salt = await bcrypt.genSalt();
     const passwordHash = await bcrypt.hash(password, salt);
 
-    let tempraryImageDirectory = '/tmp/';
-    const usersPath = path.join(process.cwd(), tempraryImageDirectory, picturePath);
-    console.log(usersPath)
+    // let tempraryImageDirectory = '/tmp/';
+    // const usersPath = path.join(process.cwd(), tempraryImageDirectory, picturePath);
+    // console.log(usersPath)
 
     let myUpload;
     try {
-      // myUpload = await cloudinary.uploader.upload('public/assets/' + picturePath);
-      myUpload = await cloudinary.uploader.upload(usersPath);
+      myUpload = await cloudinary.uploader.upload('public/assets/' + picturePath);
+      // myUpload = await cloudinary.uploader.upload(usersPath);
     } catch (uploadErr) {
 
       throw new Error('Error uploading picture: ' + uploadErr);
