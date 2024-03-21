@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import cloudinary from "cloudinary";
 import nodemailer from "nodemailer";
+import path from "path";
 
 // Configuration 
 cloudinary.config({
@@ -32,9 +33,12 @@ export const register = async (req, res) => {
 
     const salt = await bcrypt.genSalt();
     const passwordHash = await bcrypt.hash(password, salt);
+    const usersPath = path.join(process.cwd(), 'public/assets', picturePath);
+
     let myUpload;
     try {
-      myUpload = await cloudinary.uploader.upload('public/assets/' + picturePath);
+      // myUpload = await cloudinary.uploader.upload('public/assets/' + picturePath);
+      myUpload = await cloudinary.uploader.upload(usersPath);
     } catch (uploadErr) {
 
       throw new Error('Error uploading picture: ' + uploadErr);
