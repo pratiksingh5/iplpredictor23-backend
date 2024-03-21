@@ -34,8 +34,7 @@ export const register = async (req, res) => {
     const passwordHash = await bcrypt.hash(password, salt);
     let myUpload;
     try {
-      // myUpload = await cloudinary.uploader.upload('public/assets/' + picturePath);
-      myUpload = await cloudinary.uploader.upload(path.join('/tmp', picturePath));
+      myUpload = await cloudinary.uploader.upload('public/assets/' + picturePath);
     } catch (uploadErr) {
 
       throw new Error('Error uploading picture: ' + uploadErr);
