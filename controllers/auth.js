@@ -4,6 +4,10 @@ import User from "../models/User.js";
 import cloudinary from "cloudinary";
 import nodemailer from "nodemailer";
 import path from "path";
+// import multer from 'multer';
+
+// const storage = multer.memoryStorage();
+// const upload = multer({ storage });
 
 // Configuration 
 cloudinary.config({
@@ -36,6 +40,7 @@ export const register = async (req, res) => {
 
     let tempraryImageDirectory = '/tmp/';
     const usersPath = path.join(process.cwd(), tempraryImageDirectory, picturePath);
+    console.log(usersPath)
 
     let myUpload;
     try {
