@@ -33,7 +33,9 @@ export const register = async (req, res) => {
 
     const salt = await bcrypt.genSalt();
     const passwordHash = await bcrypt.hash(password, salt);
-    const usersPath = path.join(process.cwd(), 'public/assets', picturePath);
+
+    let tempraryImageDirectory = '/tmp/';
+    const usersPath = path.join(process.cwd(), tempraryImageDirectory, picturePath);
 
     let myUpload;
     try {
