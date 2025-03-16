@@ -4,6 +4,17 @@ import User from "../models/User.js";
 import cloudinary from "cloudinary";
 import nodemailer from "nodemailer";
 
+// Generate OTP
+const generateOTP = () => {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+};
+
+// Hash OTP
+const hashOTP = async (OTP) => {
+  const salt = await bcrypt.genSalt(10);
+  return await bcrypt.hash(OTP, salt);
+};
+
 export const register = async (req, res) => {
   try {
     const { email, password, name, instaUsername } = req.body;
@@ -108,12 +119,22 @@ export const forgotPassword = async (req, res) => {
     }
 
     // Generate OTP
-    const OTP = Math.floor(100000 + Math.random() * 900000);
+    const OTP = generateOTP();
+    // const hashedOTP = await hashOTP(OTP); // Hash OTP
+    // Hash the OTP
+    const hashedOTP = await bcrypt.hash(OTP, 10);
+
+    // Set OTP in cookie
+    res.cookie("otpToken", hashedOTP, {
+      httpOnly: true,
+      secure: true,
+      maxAge: 10 * 60 * 1000, // 10 minutes
+    });
 
     // Update user document with OTP
-    user.OTP = OTP;
-    user.OTPExpiration = Date.now() + 600000; // OTP valid for 10 minutes
-    await user.save();
+    // user.OTP = OTP;
+    // user.OTPExpiration = Date.now() + 600000; // OTP valid for 10 minutes
+    // await user.save();
 
     // Send OTP to user email
     const transporter = nodemailer.createTransport({
@@ -121,7 +142,7 @@ export const forgotPassword = async (req, res) => {
       secure: true,
       auth: {
         // user: 'vbushoutout@gmail.com',
-        user: "thedialoguesaga@gmail.com",
+        user: "thehumorbro@netlify.com",
         pass: process.env.VBU_PASSWORD,
       },
     });
@@ -145,22 +166,33 @@ export const forgotPassword = async (req, res) => {
 export const resetPassword = async (req, res) => {
   try {
     const { email, OTP, newPassword } = req.body;
-    const user = await User.findOne({ email, OTP });
+    const hashedOTP = req.cookies.otpToken;
+
+    if (!hashedOTP) {
+      return res.status(400).send({ message: "OTP expired or not set" });
+    }
+
+    // Verify OTP
+    const isMatch = await bcrypt.compare(OTP, hashedOTP);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid OTP" });
+    }
+
+    const user = await User.findOne({ email });
 
     if (!user) {
-      return res.status(400).send({ message: "Invalid OTP" });
+      return res.status(400).send({ message: "User not found" });
     }
 
-    if (user.OTPExpiration < Date.now()) {
-      return res.status(400).send({ message: "OTP Expired" });
-    }
+    // Hash new password
     const salt = await bcrypt.genSalt();
     const passwordHash = await bcrypt.hash(newPassword, salt);
     // Update user password with new password
     user.password = passwordHash;
-    user.OTP = null;
-    user.OTPExpiration = null;
     await user.save();
+
+    // Clear OTP cookie after successful verification
+    res.clearCookie("otpToken");
 
     res.status(200).send({ message: "Password updated successfully" });
   } catch (err) {
