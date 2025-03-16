@@ -52,9 +52,6 @@ const UserSchema = new mongoose.Schema(
     impressions: Number,
     totalVote: { type: Number, default: 0 },
     correctedVote: { type: Number, default: 0 },
-    // ✅ Add these fields
-    OTP: { type: String }, // Storing OTP as a string
-    OTPExpiration: { type: Date }, // OTP expiration time
   },
   { timestamps: true }
 );
