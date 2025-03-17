@@ -141,8 +141,7 @@ export const forgotPassword = async (req, res) => {
       service: "Gmail",
       secure: true,
       auth: {
-        // user: 'vbushoutout@gmail.com',
-        user: "thehumorbro@netlify.com",
+        user: "thedialoguesaga@gmail.com",
         pass: process.env.VBU_PASSWORD,
       },
     });
