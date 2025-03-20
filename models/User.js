@@ -44,34 +44,15 @@ const UserSchema = new mongoose.Schema(
         matchId: { type: String, required: true },
         selectedTeam: { type: String, required: true },
         isCorrect: { type: Boolean, default: false },
+        year: { type: Number, required: true },
       },
     ],
-    location: String,
-    occupation: String,
-    viewedProfile: Number,
-    impressions: Number,
-    totalVote: { type: Number, default: 0 },
-    correctedVote: { type: Number, default: 0 },
   },
   { timestamps: true }
 );
 
 UserSchema.set("toObject", { virtuals: true });
 UserSchema.set("toJSON", { virtuals: true });
-
-UserSchema.virtual("totalVoteNew").get(function () {
-  return this.votes.length;
-});
-
-UserSchema.virtual("correctedVoteNew").get(function () {
-  return this.votes.filter((vote) => vote.isCorrect).length;
-});
-
-// UserSchema.pre('save', function(next) {
-//   this.totalVote = this.votes.length;
-//   this.correctedVote = this.votes.filter(vote => vote.isCorrect).length;
-//   next();
-// });
 
 const User = mongoose.model("User", UserSchema);
 export default User;

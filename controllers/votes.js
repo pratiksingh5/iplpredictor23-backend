@@ -3,33 +3,35 @@ import User from "../models/User.js";
 import Match from "../models/Match.js";
 
 /* VOTE BY USER */
-
 export const makeVote = async (req, res) => {
   try {
-    const { userId, matchId, selectedTeam } = req.body;
+    const { userId, matchId, selectedTeam, year } = req.body;
+    const numericYear = Number(year); // Convert year to a number
+
+    if (isNaN(numericYear)) {
+      return res.status(400).json({ message: "Invalid year format" });
+    }
     // create a new Vote object to represent the user's vote
     const user = await User.findById(userId);
-    const existingVote = user.votes.find((vote) => vote.matchId === matchId);
+    // const existingVote = user.votes.find((vote) => vote.matchId === matchId);
+    const existingVote = user?.votes.find(
+      (vote) => vote.matchId === matchId && Number(vote.year) === numericYear
+    );
+
     if (existingVote) {
       res.status(400).send("You have already voted for this match");
     } else {
-      user.votes.push({
-        matchId,
-        selectedTeam,
-      });
+      user.votes.push({ matchId, selectedTeam, year: numericYear });
     }
-    // update the user's record with the new vote
-    // user.votes.push({
-    //   matchId,
-    //   selectedTeam,
-    // });
-    // save the updated user record to the database
+
     await user.save();
     const vote = new Vote({
       userId,
       matchId,
       selectedTeam,
+      year: numericYear,
     });
+
     // save the vote to the database
     vote.save((err) => {
       if (err) {
@@ -44,16 +46,19 @@ export const makeVote = async (req, res) => {
   }
 };
 
-
-export const getUserMatches = async(req, res) => {
+export const getUserMatches = async (req, res) => {
+  const { year } = req.query; // Take year from query
   try {
-    const user = await User.findById(req.params.userId).populate('votes.match');
-    const votes = user.votes;
-    const matches = await Match.find();
+    const user = await User.findById(req.params.userId).populate("votes.match");
+    const votes = user.votes.filter((vote) => vote.year === Number(year));
+    const matches = await Match.find({ year });
+
     const matchData = [];
 
-    votes.forEach(vote => {
-      const match = matches.find(match => match._id && match._id.toString() == vote.matchId);
+    votes.forEach((vote) => {
+      const match = matches.find(
+        (match) => match._id && match._id.toString() == vote.matchId
+      );
       if (match) {
         const matchDataItem = {
           matchId: vote.matchId,
@@ -74,6 +79,4 @@ export const getUserMatches = async(req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-}
-
-
+};

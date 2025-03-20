@@ -1,18 +1,11 @@
 import express from "express";
-import { getAllMatches, updateWinnerAndUserVote} from "../controllers/matches.js";
+import { getAllMatches, updateWinnerAndUserVote, addMatches} from "../controllers/matches.js";
 import { verifyToken } from "../middleware/auth.js";
 
 const router = express.Router();
 
-/* READ */
-// router.get("/", verifyToken, getFeedPosts);
-router.get("/:userId/allmatches", verifyToken, getAllMatches);
-// router.put('/updateWinner',verifyToken, updateWinner)
-// router.put('/updateUserVote', verifyToken,updateUserVote )
+router.get("/allmatches", verifyToken, getAllMatches);
 router.put('/update',verifyToken,updateWinnerAndUserVote )
-
-
-/* UPDATE */
-// router.patch("/:id/like", verifyToken, likePost);
+router.post("/add", addMatches);
 
 export default router;

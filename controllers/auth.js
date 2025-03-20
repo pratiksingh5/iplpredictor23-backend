@@ -1,7 +1,6 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
-import cloudinary from "cloudinary";
 import nodemailer from "nodemailer";
 
 // Generate OTP
@@ -9,15 +8,15 @@ const generateOTP = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
 };
 
-// Hash OTP
-const hashOTP = async (OTP) => {
-  const salt = await bcrypt.genSalt(10);
-  return await bcrypt.hash(OTP, salt);
-};
-
 export const register = async (req, res) => {
   try {
-    const { email, password, name, instaUsername } = req.body;
+    const { email, password, name, instaUsername, picturePath } = req.body;
+
+    const imageUrl =
+      picturePath && picturePath.trim() !== ""
+        ? picturePath
+        : "https://res.cloudinary.com/vbushoutout/image/upload/v1711174540/THBM-LOGO2_yt6nlf.jpg";
+
     const salt = await bcrypt.genSalt();
     const passwordHash = await bcrypt.hash(password, salt);
 
@@ -28,7 +27,7 @@ export const register = async (req, res) => {
       password: passwordHash,
       picturePath: {
         public_id: "default_img",
-        url: "https://res.cloudinary.com/vbushoutout/image/upload/v1711174540/THBM-LOGO2_yt6nlf.jpg",
+        url: imageUrl
       },
     });
     const savedUser = await newUser.save();
@@ -38,58 +37,6 @@ export const register = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
-
-/* REGISTER USER */
-// export const register = async (req, res) => {
-//   try {
-//     const {
-//       name,
-//       instaUsername,
-//       email,
-//       password,
-//       // picturePath,
-//     } = req.body;
-
-//     // cloudinary.config({
-//     //   cloud_name: "vbushoutout",
-//     //   api_key: process.env.CLOUDINARY_API_KEY,
-//     //   api_secret: process.env.CLOUDINARY_API_SECRET,
-//     //   secure: true
-//     // });
-
-//     const salt = await bcrypt.genSalt();
-//     const passwordHash = await bcrypt.hash(password, salt);
-
-//     // let tempraryImageDirectory = '/tmp/';
-//     // const usersPath = path.join(process.cwd(), tempraryImageDirectory, picturePath);
-//     // console.log(usersPath)
-
-//     // let myUpload;
-//     // try {
-//     //   myUpload = await cloudinary.uploader.upload('public/assets/' + picturePath);
-//     //   // myUpload = await cloudinary.uploader.upload(usersPath);
-//     // } catch (uploadErr) {
-
-//     //   throw new Error('Error uploading picture: ' + uploadErr);
-//     // }
-
-//     const newUser = new User({
-//       name,
-//       instaUsername,
-//       email,
-//       password: passwordHash,
-//       picturePath: {
-//         public_id: "test",
-//         url: "test_url"
-//       },
-//     });
-//     const savedUser = await newUser.save();
-//     res.status(201).json(savedUser);
-//   } catch (err) {
-//     console.log(err);
-//     res.status(500).json({ error: err.message });
-//   }
-// };
 
 /* LOGGING IN */
 export const login = async (req, res) => {
@@ -120,7 +67,6 @@ export const forgotPassword = async (req, res) => {
 
     // Generate OTP
     const OTP = generateOTP();
-    // const hashedOTP = await hashOTP(OTP); // Hash OTP
     // Hash the OTP
     const hashedOTP = await bcrypt.hash(OTP, 10);
 
@@ -130,11 +76,6 @@ export const forgotPassword = async (req, res) => {
       secure: true,
       maxAge: 10 * 60 * 1000, // 10 minutes
     });
-
-    // Update user document with OTP
-    // user.OTP = OTP;
-    // user.OTPExpiration = Date.now() + 600000; // OTP valid for 10 minutes
-    // await user.save();
 
     // Send OTP to user email
     const transporter = nodemailer.createTransport({

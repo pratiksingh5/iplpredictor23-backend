@@ -6,6 +6,7 @@ const matchSchema = new mongoose.Schema({
     team2: { type: String, required: true },
     date: { type: Date, required: true },
     winner: { type: String, default: null },
+    year: { type: Number, required: true }, 
   });
 
 const Match = mongoose.model("Match", matchSchema);

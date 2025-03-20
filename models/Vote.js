@@ -14,6 +14,7 @@ const voteSchema = new mongoose.Schema({
       type: String,
       required: true,
     },
+    year: { type: Number, required: true }, 
   });
 
 const Vote = mongoose.model("Vote", voteSchema);
