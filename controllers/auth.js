@@ -12,6 +12,14 @@ export const register = async (req, res) => {
   try {
     const { email, password, name, instaUsername, picturePath } = req.body;
 
+    // ✅ Check if the user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res
+        .status(400)
+        .json({ message: "User already exists. Please log in." });
+    }
+
     const imageUrl =
       picturePath && picturePath.trim() !== ""
         ? picturePath
@@ -27,7 +35,7 @@ export const register = async (req, res) => {
       password: passwordHash,
       picturePath: {
         public_id: "default_img",
-        url: imageUrl
+        url: imageUrl,
       },
     });
     const savedUser = await newUser.save();
@@ -74,7 +82,7 @@ export const forgotPassword = async (req, res) => {
     res.cookie("otpToken", hashedOTP, {
       httpOnly: true,
       secure: true,
-      sameSite: "None", 
+      sameSite: "None",
       maxAge: 10 * 60 * 1000, // 10 minutes
     });
 
