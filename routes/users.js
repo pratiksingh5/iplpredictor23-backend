@@ -1,9 +1,7 @@
 import express from "express";
 import {
   getUser,
-  // getAllUser
-  // getUserFriends,
-  // addRemoveFriend,
+  updateUser
 } from "../controllers/users.js";
 import { verifyToken } from "../middleware/auth.js";
 
@@ -11,6 +9,8 @@ const router = express.Router();
 
 /* READ */
 router.get("/:id", verifyToken, getUser);
+router.put("/:id", verifyToken, updateUser);
+
 // router.get('/getAllUser', getAllUser)
 // router.get("/:id/friends", verifyToken, getUserFriends);
 

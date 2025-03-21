@@ -30,7 +30,8 @@ app.use(express.urlencoded({ limit: "30mb", extended: true }));
 
 app.use(
   cors({
-    origin: "*", // Adjust this for security (e.g., allow only frontend URL)
+    origin: "https://iplpredictors.netlify.app",
+    credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
