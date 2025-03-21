@@ -16,10 +16,19 @@ export const getAllMatches = async (req, res) => {
 //Update Winner and User Vote
 export const updateWinnerAndUserVote = async (req, res) => {
   try {
-    const matchId = req.body.matchId;
-    const winner = req.body.winner;
+    const { matchId, winner } = req.body;
 
+    // Update match winner
     await Match.updateOne({ _id: matchId }, { winner: winner });
+
+    // Reset isCorrect for all users who voted on this match
+    await User.updateMany(
+      { "votes.matchId": matchId },
+      { $set: { "votes.$[vote].isCorrect": false } },
+      { arrayFilters: [{ "vote.matchId": matchId }] }
+    );
+
+    // Set isCorrect = true for users who voted for the updated winner
     await User.updateMany(
       { "votes.matchId": matchId, "votes.selectedTeam": winner },
       { $set: { "votes.$[vote].isCorrect": true } },
