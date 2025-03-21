@@ -74,8 +74,11 @@ export const forgotPassword = async (req, res) => {
     res.cookie("otpToken", hashedOTP, {
       httpOnly: true,
       secure: true,
+      sameSite: "None", 
       maxAge: 10 * 60 * 1000, // 10 minutes
     });
+
+    console.log("Cookie Set:", req.cookies);
 
     // Send OTP to user email
     const transporter = nodemailer.createTransport({

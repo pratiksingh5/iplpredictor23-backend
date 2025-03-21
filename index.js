@@ -32,12 +32,12 @@ app.use(
   cors({
     origin: "https://iplpredictors.netlify.app",
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
 app.use("/assets", express.static(path.join(__dirname, "public/assets")));
+
+// app.options("/auth/resetPassword", cors()); // ✅ Allow preflight
 
 // Cloudinary configuration
 cloudinary.config({
