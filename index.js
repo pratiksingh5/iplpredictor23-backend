@@ -32,7 +32,7 @@ app.use(cookieParser());
 
 app.use(
   cors({
-    origin: "https://iplpredictors.netlify.app",
+    origin: ["https://iplpredictors.netlify.app", "http://localhost:5173"],
     credentials: true,
   })
 );

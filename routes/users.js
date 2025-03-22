@@ -8,7 +8,7 @@ import { verifyToken } from "../middleware/auth.js";
 const router = express.Router();
 
 /* READ */
-router.get("/:id", verifyToken, getUser);
+router.get("/:id", getUser);
 router.put("/:id", verifyToken, updateUser);
 
 // router.get('/getAllUser', getAllUser)
